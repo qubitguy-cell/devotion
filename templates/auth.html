@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="container auth-shell">
+  <div class="auth-card">
+    {% if mode == 'signup' %}
+      <h1>Create account</h1>
+      <p>Sign up to save your journal reflections and prayer requests.</p>
+    {% else %}
+      <h1>Welcome back</h1>
+      <p>Log in to continue your devotional journey.</p>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('signup') if mode == 'signup' else url_for('login') }}">
+      <label>
+        Email
+        <input type="email" name="email" placeholder="you@example.com" required>
+      </label>
+
+      <label>
+        Password
+        <div class="password-input">
+          <input id="authPassword" type="password" name="password" placeholder="At least 6 characters" required>
+          <button type="button" class="password-toggle" id="passwordToggle" aria-label="Show password" aria-pressed="false" title="Show password">
+            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+          </button>
+        </div>
+      </label>
+
+      <button type="submit">
+        {% if mode == 'signup' %}Sign up{% else %}Login{% endif %}
+      </button>
+    </form>
+
+    <p class="auth-switch">
+      {% if mode == 'signup' %}
+        Already have an account? <a href="{{ url_for('login') }}">Login</a>
+      {% else %}
+        Need an account? <a href="{{ url_for('signup') }}">Sign up</a>
+      {% endif %}
+    </p>
+  </div>
+</section>
+<script>
+  const authPassword = document.getElementById('authPassword');
+  const passwordToggle = document.getElementById('passwordToggle');
+
+  passwordToggle.addEventListener('click', () => {
+    const showPassword = authPassword.type === 'password';
+    authPassword.type = showPassword ? 'text' : 'password';
+    const label = showPassword ? 'Hide password' : 'Show password';
+    passwordToggle.setAttribute('aria-label', label);
+    passwordToggle.setAttribute('aria-pressed', String(showPassword));
+    passwordToggle.title = label;
+    passwordToggle.querySelector('i').className = `fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`;
+  });
+</script>
+{% endblock %}

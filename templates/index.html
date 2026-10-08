@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero">
+  <div class="container hero-inner">
+    <div>
+      <p class="eyebrow">Daily devotion</p>
+      <h1>{{ devotional.title }}</h1>
+      <p class="lead">{{ devotional.message }}</p>
+    </div>
+
+    <div class="scripture-flipper" aria-live="polite">
+      <div class="scripture-card" id="scriptureCard">
+        <div class="scripture-face scripture-front">
+          <span class="face-label">Scripture</span>
+          <blockquote id="scriptureText">“{{ devotional.verse }}”</blockquote>
+          <p class="verse-ref" id="scriptureRef">{{ devotional.reference }}</p>
+        </div>
+        <div class="scripture-face scripture-back">
+          <span class="face-label">Next verse</span>
+          <blockquote id="nextScriptureText">“The Lord is my shepherd; I shall not want.”</blockquote>
+          <p class="verse-ref" id="nextScriptureRef">Psalm 23:1</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container section-grid">
+  <div class="card">
+    <h2>Recent reflections</h2>
+    {% for entry in entries %}
+      <div class="list-item">
+        <strong>{{ entry.name }}</strong>
+        <p>{{ entry.reflection }}</p>
+      </div>
+    {% else %}
+      <p>No reflections yet. Be the first to write one.</p>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h2>Prayer requests</h2>
+    {% for prayer in prayers %}
+      <div class="list-item">
+        <strong>{{ prayer.name }}</strong>
+        <p>{{ prayer.request }}</p>
+      </div>
+    {% else %}
+      <p>No prayer requests yet.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+  const verses = [
+    { text: "The Lord is my shepherd; I shall not want.", ref: "Psalm 23:1" },
+    { text: "Be still, and know that I am God.", ref: "Psalm 46:10" },
+    { text: "Let all that you do be done in love.", ref: "1 Corinthians 16:14" },
+    { text: "The steadfast love of the Lord never ceases.", ref: "Lamentations 3:22-23" },
+    { text: "Trust in the Lord with all your heart.", ref: "Proverbs 3:5" }
+  ];
+
+  const scriptureText = document.getElementById('scriptureText');
+  const scriptureRef = document.getElementById('scriptureRef');
+  const nextScriptureText = document.getElementById('nextScriptureText');
+  const nextScriptureRef = document.getElementById('nextScriptureRef');
+  const scriptureCard = document.getElementById('scriptureCard');
+
+  let verseIndex = 0;
+
+  function updateVerses() {
+    const current = verses[verseIndex % verses.length];
+    const next = verses[(verseIndex + 1) % verses.length];
+
+    scriptureText.textContent = `“${current.text}”`;
+    scriptureRef.textContent = current.ref;
+    nextScriptureText.textContent = `“${next.text}”`;
+    nextScriptureRef.textContent = next.ref;
+  }
+
+  updateVerses();
+
+  setInterval(() => {
+    scriptureCard.classList.toggle('is-flipped');
+    setTimeout(() => {
+      verseIndex = (verseIndex + 1) % verses.length;
+      updateVerses();
+    }, 280);
+  }, 4500);
+</script>
+{% endblock %}

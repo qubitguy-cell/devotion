@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Devotionals{% endblock %}
+
+{% block content %}
+<div class="page-shell admin-shell">
+  <div class="container">
+    <div class="section-header">
+      <p class="eyebrow">Admin</p>
+      <h1>Devotional Posts</h1>
+    </div>
+
+    <div class="admin-layout">
+      <section class="admin-panel">
+        <h2>Create a devotional</h2>
+        <form method="POST">
+          <div class="form-grid">
+            <label>
+              <span>Date</span>
+              <input type="date" name="date" required>
+            </label>
+            <label>
+              <span>Title</span>
+              <input type="text" name="title" placeholder="Morning Hope" required>
+            </label>
+            <label class="full-width">
+              <span>Verse</span>
+              <input type="text" name="verse" placeholder="Psalm 23:1" required>
+            </label>
+            <label class="full-width">
+              <span>Body</span>
+              <textarea name="body" rows="8" placeholder="Write the devotional reflection here..." required></textarea>
+            </label>
+          </div>
+
+          <button type="submit" class="primary-btn">Save devotional</button>
+        </form>
+      </section>
+
+      <aside class="admin-panel">
+        <h2>Recent entries</h2>
+        <div class="admin-list">
+          {% if devotionals %}
+            {% for devotional in devotionals %}
+              <div class="admin-item">
+                <strong>{{ devotional.get('title') or 'Untitled' }}</strong>
+                <small>{{ devotional.get('date') or 'No date' }}</small>
+                <p><em>{{ devotional.get('verse') or 'No verse' }}</em></p>
+                <p>{{ devotional.get('body') or '' }}</p>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p>No devotionals yet.</p>
+          {% endif %}
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+{% endblock %}

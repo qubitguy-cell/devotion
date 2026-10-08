@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="container inner-page">
+  <div class="page-header">
+    <h1>AI Prayer Companion</h1>
+    <p>Ask for encouragement, reflection prompts, or prayer guidance from Gemini.</p>
+  </div>
+
+  <div class="chat-shell card">
+    <div class="chat-history">
+      {% if history %}
+        {% for item in history %}
+          <div class="chat-message {{ item.role }}">
+            <strong>{{ 'You' if item.role == 'user' else 'Companion' }}</strong>
+            <p>{{ item.text }}</p>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="chat-message assistant">
+          <strong>Companion</strong>
+          <p>Welcome. Ask for a scripture reflection, prayer prompt, or encouragement for your day.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <form method="post" class="chat-form">
+      <textarea name="message" rows="4" placeholder="Ask for a prayer, reflection, or words of encouragement..."></textarea>
+      <button type="submit">Send to Gemini</button>
+    </form>
+  </div>
+</section>
+
+<script>
+  const chatMessageInput = document.querySelector('.chat-form textarea[name="message"]');
+
+  chatMessageInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+      event.preventDefault();
+      chatMessageInput.form.requestSubmit();
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="container inner-page">
+  <div class="page-header">
+    <h1>Journal your walk with God</h1>
+    <p>Capture your thoughts, prayers, and lessons from the day.</p>
+  </div>
+
+  <div class="form-card">
+    <form method="post">
+      <label>
+        Name
+        <input type="text" name="name" placeholder="Your name or initials">
+      </label>
+      <label>
+        Reflection
+        <textarea name="reflection" rows="6" placeholder="What stood out to you today?"></textarea>
+      </label>
+      <button type="submit">Save reflection</button>
+    </form>
+  </div>
+
+  <div class="card card-list">
+    <h2>Recent entries</h2>
+    {% for entry in entries %}
+      <article class="list-item">
+        <strong>{{ entry.name }}</strong>
+        <p>{{ entry.reflection }}</p>
+      </article>
+    {% else %}
+      <p>No journal entries yet.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
