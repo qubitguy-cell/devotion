@@ -2,7 +2,10 @@
 
 from importlib import import_module
 
-from .db import get_journal_entries, save_journal_entry, get_prayer_requests, save_prayer_request
+try:
+    from app.db import get_journal_entries, save_journal_entry, get_prayer_requests, save_prayer_request
+except ImportError:  # pragma: no cover - fallback for flat deployment layouts
+    from db import get_journal_entries, save_journal_entry, get_prayer_requests, save_prayer_request
 
 __all__ = [
     "app",
