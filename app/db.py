@@ -79,19 +79,29 @@ def _devotionals_rest_request(method, *, params=None, payload=None):
     return response.json() if response.content else []
 
 
+def _fallback_local_entries(key, limit=None):
+    data = _read_local_store().get(key, [])
+    return data[-limit:] if limit else data
+
+
 def get_daily_devotionals(limit=None):
     client = _get_client()
     if client is None:
         if _is_real_supabase_config():
-            return _devotionals_rest_request(
-                "GET",
-                params={"select": "*", "order": "date.desc", "limit": limit or 1000},
-            )
-        data = _read_local_store()["devotionals"]
-        return data[-limit:] if limit else data
+            try:
+                return _devotionals_rest_request(
+                    "GET",
+                    params={"select": "*", "order": "date.desc", "limit": limit or 1000},
+                )
+            except Exception:
+                pass
+        return _fallback_local_entries("devotionals", limit)
 
-    response = client.table("devotionals").select("*").order("created_at", desc=True).limit(limit or 1000).execute()
-    return response.data if response.data else []
+    try:
+        response = client.table("devotionals").select("*").order("created_at", desc=True).limit(limit or 1000).execute()
+        return response.data if response.data else []
+    except Exception:
+        return _fallback_local_entries("devotionals", limit)
 
 
 def save_daily_devotional(title, verse, body, date):
@@ -100,26 +110,38 @@ def save_daily_devotional(title, verse, body, date):
 
     if client is None:
         if _is_real_supabase_config():
-            rows = _devotionals_rest_request("POST", payload=payload)
-            return rows[0] if rows else payload
+            try:
+                rows = _devotionals_rest_request("POST", payload=payload)
+                return rows[0] if rows else payload
+            except Exception:
+                pass
         store = _read_local_store()
         entry = {"id": len(store["devotionals"]) + 1, "title": title, "verse": verse, "body": body, "date": date, "created_at": "now"}
         store["devotionals"].append(entry)
         _write_local_store(store)
         return entry
 
-    response = client.table("devotionals").insert(payload).execute()
-    return response.data[0] if response.data else payload
+    try:
+        response = client.table("devotionals").insert(payload).execute()
+        return response.data[0] if response.data else payload
+    except Exception:
+        store = _read_local_store()
+        entry = {"id": len(store["devotionals"]) + 1, "title": title, "verse": verse, "body": body, "date": date, "created_at": "now"}
+        store["devotionals"].append(entry)
+        _write_local_store(store)
+        return entry
 
 
 def get_journal_entries(limit=None):
     client = _get_client()
     if client is None:
-        data = _read_local_store()["journal_entries"]
-        return data[-limit:] if limit else data
+        return _fallback_local_entries("journal_entries", limit)
 
-    response = client.table("journal_entries").select("*").order("created_at", desc=True).limit(limit or 1000).execute()
-    return response.data if response.data else []
+    try:
+        response = client.table("journal_entries").select("*").order("created_at", desc=True).limit(limit or 1000).execute()
+        return response.data if response.data else []
+    except Exception:
+        return _fallback_local_entries("journal_entries", limit)
 
 
 def save_journal_entry(name, reflection):
@@ -133,18 +155,27 @@ def save_journal_entry(name, reflection):
         _write_local_store(store)
         return entry
 
-    response = client.table("journal_entries").insert(payload).execute()
-    return response.data[0] if response.data else payload
+    try:
+        response = client.table("journal_entries").insert(payload).execute()
+        return response.data[0] if response.data else payload
+    except Exception:
+        store = _read_local_store()
+        entry = {"id": len(store["journal_entries"]) + 1, "name": name, "reflection": reflection, "created_at": "now"}
+        store["journal_entries"].append(entry)
+        _write_local_store(store)
+        return entry
 
 
 def get_prayer_requests(limit=None):
     client = _get_client()
     if client is None:
-        data = _read_local_store()["prayer_requests"]
-        return data[-limit:] if limit else data
+        return _fallback_local_entries("prayer_requests", limit)
 
-    response = client.table("prayer_requests").select("*").order("created_at", desc=True).limit(limit or 1000).execute()
-    return response.data if response.data else []
+    try:
+        response = client.table("prayer_requests").select("*").order("created_at", desc=True).limit(limit or 1000).execute()
+        return response.data if response.data else []
+    except Exception:
+        return _fallback_local_entries("prayer_requests", limit)
 
 
 def save_prayer_request(name, request):
@@ -158,5 +189,12 @@ def save_prayer_request(name, request):
         _write_local_store(store)
         return prayer
 
-    response = client.table("prayer_requests").insert(payload).execute()
-    return response.data[0] if response.data else payload
+    try:
+        response = client.table("prayer_requests").insert(payload).execute()
+        return response.data[0] if response.data else payload
+    except Exception:
+        store = _read_local_store()
+        prayer = {"id": len(store["prayer_requests"]) + 1, "name": name, "request": request, "created_at": "now"}
+        store["prayer_requests"].append(prayer)
+        _write_local_store(store)
+        return prayer
