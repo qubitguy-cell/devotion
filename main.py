@@ -4,7 +4,7 @@ import requests
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 
-from app.db import (
+from db import (
     get_daily_devotionals,
     get_journal_entries,
     get_prayer_requests,
